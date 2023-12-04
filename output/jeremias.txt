@@ -1,0 +1,17 @@
+nome: jeremias
+numeroColunas: 1
+chavePrimaria: 1
+nomeColuna 1: id
+tipoColuna 1: 2
+nomeColuna 2: id
+tipoColuna 2: 2
+nomeColuna 3: id
+tipoColuna 3: 2
+sadffasd
+dsaf
+fsda
+dfsda
+fsdafasd
+fsdafasddasdf
+sadffasd
+
