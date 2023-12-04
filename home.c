@@ -136,22 +136,42 @@ void criarTabela(Tabela *tabela){
     free(tabela->colunas);
 }
 
-int main(){
+void listarTabelas(){\
+    FILE *tabelaPrincipal;
+    char nome[] = "tabelas.txt";
+    char nomeTabela[NOME_LIMITE];
+
+    tabelaPrincipal = fopen(nome, "r");
+    if (tabelaPrincipal == NULL) {
+        printf("NAO FORAM ENCONTRADAS TABELAS \n");
+        return;
+    }
+
+    printf("=== LISTA DE TABELAS ===\n");
+    while (fgets(nomeTabela, sizeof(nomeTabela), tabelaPrincipal) != NULL) {
+        nomeTabela[strcspn(nomeTabela, "\n")] = '\0';
+        printf("%s\n", nomeTabela);
+    }
+
+    fclose(tabelaPrincipal);
+}
+
+int main() {
     int op;
     Tabela tabela;
-    while(1){
-        printf("===================================\n");
-        printf("= 0 - Encerrar | 1 - Criar Tabela =\n");
-        printf("===================================\n");
+    while (1) {
+        printf("========================================================\n");
+        printf("| 0 - Encerrar | 1 - Criar Tabela | 2 - Listar Tabelas |\n");
+        printf("========================================================\n");
         scanf("%d", &op);
-        switch (op){
+        switch (op) {
             case 0:
-                printf("==============\n");
-                printf("= ENCERRADO! =\n");
-                printf("==============\n");
                 return 0;
             case 1:
                 criarTabela(&tabela);
+                break;
+            case 2:
+                listarTabelas();
                 break;
             default:
                 printf("INVALIDO! \n");
@@ -160,3 +180,4 @@ int main(){
     }
     return 0;
 }
+

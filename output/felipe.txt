@@ -1,5 +1,0 @@
-nome: felipe
-numeroColunas: 1
-chavePrimaria: 1
-nomeColuna 1: id
-tipoColuna 1: 2

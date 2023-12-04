@@ -1,5 +1,0 @@
-nome: jeremias
-numeroColunas: 1
-colunaChavePrimaria: jerezin
-nomeColuna 1: usuarios
-tipoColuna 1: 1
