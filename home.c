@@ -97,8 +97,8 @@ void criarTabela(Tabela *tabela){
     fprintf(arquivo, "numeroColunas: %d\n", tabela->numColunas);
     fprintf(arquivo, "colunaChavePrimaria: %s\n", tabela->colunaChavePrimaria);
     for(int i = 0; i < tabela->numColunas; i++){
-        fprintf(arquivo, "nomeColuna %d: %s\n", i+1, tabela->colunas[i].nome);
-        fprintf(arquivo, "tipoColuna %d: %d\n", i+1, tabela->colunas[i].tipo);
+        fprintf(arquivo, "nomeColuna: %s\n", tabela->colunas[i].nome);
+        fprintf(arquivo, "tipoColuna: %d\n", tabela->colunas[i].tipo);
     }
     fclose(arquivo);
 
