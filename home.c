@@ -16,6 +16,12 @@ typedef struct {
     char colunaChavePrimaria[NOME_LIMITE];
 } Tabela;
 
+typedef struct {
+    Tabela tabela;
+    Coluna coluna;
+    char valor[NOME_LIMITE];
+} Registro;
+
 Tabela coletarDadosTabela(char nome[]){
     Tabela tabela;
     FILE *arquivo;
@@ -46,11 +52,11 @@ Tabela coletarDadosTabela(char nome[]){
         fscanf(arquivo, "nomeColuna: %s\n", tabela.colunas[i].nome);
         fscanf(arquivo, "tipoColuna: %d\n", &tabela.colunas[i].tipo);
     }
+    // Precisa de um while (parecido com o de listarTabelas) para coletar os registros
 
     fclose(arquivo);
     return tabela;
 }
-
 
 int existeTabela(char nome[]){
     FILE *tabelaPrincipal;
@@ -203,7 +209,7 @@ void criarTabela(Tabela *tabela){
     free(tabela->colunas);
 }
 
-void listarTabelas(){\
+void listarTabelas(){
     FILE *tabelaPrincipal;
     char nome[] = "tabelas.txt";
     char nomeTabela[NOME_LIMITE];
@@ -228,11 +234,24 @@ void criarRegistro(Tabela *tabela){
     // Falta completar...
 }
 
+void listarDadosTabela(Tabela *tabela){
+    *tabela = coletarDadosTabela(tabela->nome);
+
+    printf("=== DADOS DA TABELA %s ===\n", tabela->nome);
+    // Mostra o nome das colunas da tabela
+    printf("| %s |", tabela->colunaChavePrimaria);
+    for(int i = 0; i < tabela->numColunas; i++){
+        printf(" %s |", tabela->colunas[i].nome);
+    }
+    printf("\n");
+    // Precisa mostrar os registros
+}
+
 int main(){
     int op;
     Tabela tabela;
     while(1){
-        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro |\n");
+        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela |\n");
         scanf("%d", &op);
         switch (op) {
             case 0:
@@ -250,6 +269,17 @@ int main(){
                 tabela.nome[strcspn(tabela.nome, "\n")] = '\0';
                 if(existeTabela(tabela.nome)){
                     criarRegistro(&tabela);
+                } else {
+                    printf("A TABELA %s NAO EXISTE!\n", tabela.nome);
+                }
+                break;
+            case 4:
+                getchar();
+                printf("INFORME O NOME DA TABELA: ");
+                fgets(tabela.nome, NOME_LIMITE, stdin);
+                tabela.nome[strcspn(tabela.nome, "\n")] = '\0';
+                if(existeTabela(tabela.nome)){
+                    listarDadosTabela(&tabela);
                 } else {
                     printf("A TABELA %s NAO EXISTE!\n", tabela.nome);
                 }
