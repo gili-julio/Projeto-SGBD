@@ -16,11 +16,43 @@ typedef struct {
     char colunaChavePrimaria[NOME_LIMITE];
 } Tabela;
 
+int existeTabela(char nome[]) {
+    FILE *tabelaPrincipal;
+    char tabelas[] = "tabelas.txt";
+    char linha[NOME_LIMITE];
+    
+    // Se não existir o arquivo tabelas.txt
+    tabelaPrincipal = fopen(tabelas, "r");
+    if (tabelaPrincipal == NULL) {
+        return 0;
+    }
+
+    // Procura o nome da tabela no arquivo de tabelas
+    while (fgets(linha, sizeof(linha), tabelaPrincipal) != NULL) {
+        linha[strcspn(linha, "\n")] = '\0';
+        if (strcmp(nome, linha) == 0) {
+            fclose(tabelaPrincipal);
+            return 1;
+        }
+    }
+
+    fclose(tabelaPrincipal);
+    return 0;
+}
+
+
 void criarTabela(Tabela *tabela){
     getchar();
-    printf("INFORME O NOME DA TABELA: ");
-    fgets(tabela->nome, NOME_LIMITE, stdin);
-    tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
+    while(1){
+        printf("INFORME O NOME DA TABELA: ");
+        fgets(tabela->nome, NOME_LIMITE, stdin);
+        tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
+        if(existeTabela(tabela->nome)){
+            printf("A TABELA %s JA EXISTE!\n", tabela->nome);
+        } else {
+            break;
+        }
+    }
 
     printf("INFORME O NOME DA COLUNA DA CHAVE PRIMARIA: ");
     fgets(tabela->colunaChavePrimaria, NOME_LIMITE, stdin);
@@ -159,10 +191,8 @@ void listarTabelas(){\
 int main() {
     int op;
     Tabela tabela;
-    while (1) {
-        printf("========================================================\n");
-        printf("| 0 - Encerrar | 1 - Criar Tabela | 2 - Listar Tabelas |\n");
-        printf("========================================================\n");
+    while(1){
+        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro |\n");
         scanf("%d", &op);
         switch (op) {
             case 0:
@@ -178,6 +208,5 @@ int main() {
                 break;
         }
     }
-    return 0;
 }
 
