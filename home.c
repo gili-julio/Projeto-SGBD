@@ -36,13 +36,11 @@ Tabela coletarDadosTabela(char nome[]) {
     fscanf(arquivo, "nome: %s\n", tabela.nome);
     fscanf(arquivo, "numeroColunas: %d\n", &(tabela.numColunas));
     fscanf(arquivo, "colunaChavePrimaria: %s\n", tabela.colunaChavePrimaria);
-
     tabela.colunas = malloc(tabela.numColunas * sizeof(Coluna));
     if (tabela.colunas == NULL) {
         printf("ERRO AO ALOCAR MEMORIA PARA AS COLUNAS\n");
         exit(1);
     }
-
     for (int i = 0; i < tabela.numColunas; i++) {
         fscanf(arquivo, "nomeColuna: %s\n", tabela.colunas[i].nome);
         fscanf(arquivo, "tipoColuna: %d\n", &tabela.colunas[i].tipo);
@@ -65,17 +63,15 @@ int existeChavePrimaria(Tabela *tabela, int num) {
 
     char chavePrimaria[NOME_LIMITE];
     int valor;
-    char tipoDado[NOME_LIMITE]; // Adicionando um buffer para ler o tipo de dado (opcional)
-
     // Modificando o formato de leitura para se adaptar ao conteúdo do arquivo
     while (fscanf(arquivo, "%[^:]: ", chavePrimaria) == 1) {
-        // Leitura do valor da chave primária e do tipo de dado (opcional)
+        // Leitura do valor da chave primária
         if (strcmp(chavePrimaria, tabela->colunaChavePrimaria) == 0) {
             fscanf(arquivo, "%d", &valor);
-            // Lógica para verificar se o valor corresponde à chave primária
+            // Verificar se o valor corresponde à chave primária
             if (valor == num) {
                 fclose(arquivo);
-                return 1; // Retorna 1 se encontrar a chave primária com o valor
+                return 1; // Retorna 1 se encontrar a chave primária com valor igual
             }
         } else {
             // Se a chave primária não corresponde, avança para a próxima linha
@@ -84,7 +80,7 @@ int existeChavePrimaria(Tabela *tabela, int num) {
     }
 
     fclose(arquivo);
-    return 0; // Retorna 0 se não encontrar a chave primária com o valor
+    return 0; // Retorna 0 se não encontrar a chave primária com valor igual
 }
 
 int existeTabela(char nome[]){
@@ -291,6 +287,7 @@ void criarRegistro(Tabela *tabela){
             char registroString[NOME_LIMITE];
             switch(tabela->colunas[i-1].tipo){
                 case 1: // Caso char
+                    getchar();
                     scanf("%c", &registroChar);
                     fprintf(arquivo, "%s: %c\n", tabela->colunas[i-1].nome, registroChar);
                     break;
@@ -320,17 +317,51 @@ void criarRegistro(Tabela *tabela){
     fclose(arquivo);
 }
 
-void listarDadosTabela(Tabela *tabela){
+void listarDadosTabela(Tabela *tabela) {
     *tabela = coletarDadosTabela(tabela->nome);
 
     printf("=== DADOS DA TABELA %s ===\n", tabela->nome);
-    // Mostra o nome das colunas da tabela
-    printf("| %s |", tabela->colunaChavePrimaria);
-    for(int i = 0; i < tabela->numColunas; i++){
-        printf(" %s |", tabela->colunas[i].nome);
+
+    // Abrir o arquivo da tabela para leitura dos registros
+    FILE *arquivo;
+    char nomeArquivo[NOME_LIMITE + 4];
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("ERRO AO ABRIR O ARQUIVO %s \n", nomeArquivo);
+        return;
     }
-    printf("\n");
-    // Precisa mostrar os registros
+
+    int linhasParaPular = 3 + (2 * tabela->numColunas);
+    char linha[NOME_LIMITE * 2]; // buffer para armazenar a linha lida
+    int count = 0;
+    // Pular as linhas iniciais
+    while(count < linhasParaPular){
+        if(fgets(linha, sizeof(linha), arquivo) == NULL){
+            printf("ERRO: Não há registros nesta tabela.\n");
+            fclose(arquivo);
+            return;
+        }
+        count++;
+    }
+    // Exibir os registros
+    count = 0;
+    while(fgets(linha, sizeof(linha), arquivo) != NULL){
+        // Remove a quebra de linha dos registros
+        linha[strcspn(linha, "\n")] = '\0';
+        if(count % (tabela->numColunas + 1) == 0 && count != 0){
+            printf("|\n| %s ", linha); // Mostra a linha com quebra de linha e sem espaço
+        } else if(count == 0){
+            printf("| %s ", linha); // Mostra a linha sem quebra de linha e sem espaço
+        } else{
+            printf("| %s ", linha); // Mostra a linha sem quebra de linha e com espaço
+        }
+        count++;
+    }
+    if(count != 0){
+        printf("|\n");
+    }
+    fclose(arquivo);
 }
 
 int main(){
