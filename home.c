@@ -16,20 +16,14 @@ typedef struct {
     char colunaChavePrimaria[NOME_LIMITE];
 } Tabela;
 
-typedef struct {
-    Tabela tabela;
-    Coluna coluna;
-    char valor[NOME_LIMITE];
-} Registro;
-
-Tabela coletarDadosTabela(char nome[]){
+Tabela coletarDadosTabela(char nome[]) {
     Tabela tabela;
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE + 4];
     sprintf(nomeArquivo, "%s.txt", nome);
 
-    arquivo = fopen(nomeArquivo, "r");
-    if(arquivo == NULL){
+    arquivo = fopen(nomeArquivo, "rb");
+    if (arquivo == NULL) {
         printf("ERRO AO ABRIR O ARQUIVO %s \n", nomeArquivo);
         strcpy(tabela.nome, "");
         tabela.numColunas = 0;
@@ -38,24 +32,59 @@ Tabela coletarDadosTabela(char nome[]){
         return tabela;
     }
 
+    // Leitura dos dados do arquivo
     fscanf(arquivo, "nome: %s\n", tabela.nome);
-    fscanf(arquivo, "numeroColunas: %d\n", &tabela.numColunas);
+    fscanf(arquivo, "numeroColunas: %d\n", &(tabela.numColunas));
     fscanf(arquivo, "colunaChavePrimaria: %s\n", tabela.colunaChavePrimaria);
 
     tabela.colunas = malloc(tabela.numColunas * sizeof(Coluna));
-    if(tabela.colunas == NULL){
+    if (tabela.colunas == NULL) {
         printf("ERRO AO ALOCAR MEMORIA PARA AS COLUNAS\n");
         exit(1);
     }
 
-    for(int i = 0; i < tabela.numColunas; i++){
+    for (int i = 0; i < tabela.numColunas; i++) {
         fscanf(arquivo, "nomeColuna: %s\n", tabela.colunas[i].nome);
         fscanf(arquivo, "tipoColuna: %d\n", &tabela.colunas[i].tipo);
     }
-    // Precisa de um while (parecido com o de listarTabelas) para coletar os registros
 
     fclose(arquivo);
     return tabela;
+}
+
+int existeChavePrimaria(Tabela *tabela, int num) {
+    FILE *arquivo;
+    char nomeArquivo[NOME_LIMITE + 4];
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+
+    arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("ERRO AO ABRIR O ARQUIVO %s \n", nomeArquivo);
+        return 0;
+    }
+
+    char chavePrimaria[NOME_LIMITE];
+    int valor;
+    char tipoDado[NOME_LIMITE]; // Adicionando um buffer para ler o tipo de dado (opcional)
+
+    // Modificando o formato de leitura para se adaptar ao conteúdo do arquivo
+    while (fscanf(arquivo, "%[^:]: ", chavePrimaria) == 1) {
+        // Leitura do valor da chave primária e do tipo de dado (opcional)
+        if (strcmp(chavePrimaria, tabela->colunaChavePrimaria) == 0) {
+            fscanf(arquivo, "%d", &valor);
+            // Lógica para verificar se o valor corresponde à chave primária
+            if (valor == num) {
+                fclose(arquivo);
+                return 1; // Retorna 1 se encontrar a chave primária com o valor
+            }
+        } else {
+            // Se a chave primária não corresponde, avança para a próxima linha
+            fgets(chavePrimaria, NOME_LIMITE, arquivo);
+        }
+    }
+
+    fclose(arquivo);
+    return 0; // Retorna 0 se não encontrar a chave primária com o valor
 }
 
 int existeTabela(char nome[]){
@@ -70,7 +99,7 @@ int existeTabela(char nome[]){
     }
 
     // Procura o nome da tabela no arquivo de tabelas
-    while (fgets(linha, sizeof(linha), tabelaPrincipal) != NULL) {
+    while(fgets(linha, sizeof(linha), tabelaPrincipal) != NULL){
         linha[strcspn(linha, "\n")] = '\0';
         if (strcmp(nome, linha) == 0) {
             fclose(tabelaPrincipal);
@@ -231,7 +260,64 @@ void listarTabelas(){
 
 void criarRegistro(Tabela *tabela){
     *tabela = coletarDadosTabela(tabela->nome);
-    // Falta completar...
+
+    FILE *arquivo;
+    char nomeArquivo[NOME_LIMITE + 4];
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    arquivo = fopen(nomeArquivo, "a");
+    if(arquivo == NULL){
+        printf("ERRO AO ABRIR O ARQUIVO %s \n", nomeArquivo);
+        return;
+    }
+
+    // Solicita o valor de cada coluna
+    for(int i = 0; i < tabela->numColunas+1; i++){
+        if(i == 0){ // Chave primária
+            int registro;
+            printf("INFORME O VALOR DA COLUNA %s: ", tabela->colunaChavePrimaria);
+            scanf("%d", &registro);
+            if(registro >= 0 && existeChavePrimaria(tabela, registro) == 0){
+                fprintf(arquivo, "%s: %d\n", tabela->colunaChavePrimaria, registro);
+            } else {
+                printf("VALOR INVALIDO!\n");
+                return;
+            }
+        } else {
+            printf("INFORME O VALOR DA COLUNA %s: ", tabela->colunas[i-1].nome);
+            char registroChar;
+            int registroInt;
+            float registroFloat;
+            double registroDouble;
+            char registroString[NOME_LIMITE];
+            switch(tabela->colunas[i-1].tipo){
+                case 1: // Caso char
+                    scanf("%c", &registroChar);
+                    fprintf(arquivo, "%s: %c\n", tabela->colunas[i-1].nome, registroChar);
+                    break;
+                case 2: // Caso int
+                    scanf("%d", &registroInt);
+                    fprintf(arquivo, "%s: %d\n", tabela->colunas[i-1].nome, registroInt);
+                    break;
+                case 3: // Caso float
+                    scanf("%f", &registroFloat);
+                    fprintf(arquivo, "%s: %f\n", tabela->colunas[i-1].nome, registroFloat);
+                    break;
+                case 4: // Caso double
+                    scanf("%lf", &registroDouble);
+                    fprintf(arquivo, "%s: %f\n", tabela->colunas[i-1].nome, registroDouble);
+                    break;
+                case 5: // Caso string
+                    getchar();
+                    fgets(registroString, NOME_LIMITE, stdin);
+                    registroString[strcspn(registroString, "\n")] = '\0';
+                    fprintf(arquivo, "%s: %s\n", tabela->colunas[i-1].nome, registroString);
+                    break;
+            }
+        }
+    }
+
+    printf("REGISTRO FEITO!\n");
+    fclose(arquivo);
 }
 
 void listarDadosTabela(Tabela *tabela){
