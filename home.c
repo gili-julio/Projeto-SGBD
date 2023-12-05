@@ -16,7 +16,43 @@ typedef struct {
     char colunaChavePrimaria[NOME_LIMITE];
 } Tabela;
 
-int existeTabela(char nome[]) {
+Tabela coletarDadosTabela(char nome[]){
+    Tabela tabela;
+    FILE *arquivo;
+    char nomeArquivo[NOME_LIMITE + 4];
+    sprintf(nomeArquivo, "%s.txt", nome);
+
+    arquivo = fopen(nomeArquivo, "r");
+    if(arquivo == NULL){
+        printf("ERRO AO ABRIR O ARQUIVO %s \n", nomeArquivo);
+        strcpy(tabela.nome, "");
+        tabela.numColunas = 0;
+        tabela.colunas = NULL;
+        strcpy(tabela.colunaChavePrimaria, "");
+        return tabela;
+    }
+
+    fscanf(arquivo, "nome: %s\n", tabela.nome);
+    fscanf(arquivo, "numeroColunas: %d\n", &tabela.numColunas);
+    fscanf(arquivo, "colunaChavePrimaria: %s\n", tabela.colunaChavePrimaria);
+
+    tabela.colunas = malloc(tabela.numColunas * sizeof(Coluna));
+    if(tabela.colunas == NULL){
+        printf("ERRO AO ALOCAR MEMORIA PARA AS COLUNAS\n");
+        exit(1);
+    }
+
+    for(int i = 0; i < tabela.numColunas; i++){
+        fscanf(arquivo, "nomeColuna: %s\n", tabela.colunas[i].nome);
+        fscanf(arquivo, "tipoColuna: %d\n", &tabela.colunas[i].tipo);
+    }
+
+    fclose(arquivo);
+    return tabela;
+}
+
+
+int existeTabela(char nome[]){
     FILE *tabelaPrincipal;
     char tabelas[] = "tabelas.txt";
     char linha[NOME_LIMITE];
@@ -39,7 +75,6 @@ int existeTabela(char nome[]) {
     fclose(tabelaPrincipal);
     return 0;
 }
-
 
 void criarTabela(Tabela *tabela){
     getchar();
@@ -188,7 +223,12 @@ void listarTabelas(){\
     fclose(tabelaPrincipal);
 }
 
-int main() {
+void criarRegistro(Tabela *tabela){
+    *tabela = coletarDadosTabela(tabela->nome);
+    // Falta completar...
+}
+
+int main(){
     int op;
     Tabela tabela;
     while(1){
@@ -202,6 +242,17 @@ int main() {
                 break;
             case 2:
                 listarTabelas();
+                break;
+            case 3:
+                getchar();
+                printf("INFORME O NOME DA TABELA: ");
+                fgets(tabela.nome, NOME_LIMITE, stdin);
+                tabela.nome[strcspn(tabela.nome, "\n")] = '\0';
+                if(existeTabela(tabela.nome)){
+                    criarRegistro(&tabela);
+                } else {
+                    printf("A TABELA %s NAO EXISTE!\n", tabela.nome);
+                }
                 break;
             default:
                 printf("INVALIDO! \n");
