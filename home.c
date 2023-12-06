@@ -429,34 +429,40 @@ void apagarTabela() {
     printf("TABELA '%s' REMOVIDA COM SUCESSO\n", nomeTabela);
 }
 
+int escolhas(int op){
+    Tabela tabela;
+    switch(op){
+        case 0:
+            return 0;
+        case 1:
+            criarTabela(&tabela);
+            break;
+        case 2:
+            listarTabelas();
+            break;
+        case 3:
+            criarRegistro(&tabela);
+            break;
+        case 4:
+            listarDadosTabela(&tabela);
+            break;
+        case 7:
+            apagarTabela();
+            break;
+        default:
+            printf("INVALIDO! \n");
+            break;
+    }
+    return 1;
+}
+
 int main(){
     int op;
-    Tabela tabela;
-    while(1){
+    while(op != 0){
         printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela | 7 - Apagar uma tabela |\n");
         scanf("%d", &op);
-        switch(op){
-            case 0:
-                return 0;
-            case 1:
-                criarTabela(&tabela);
-                break;
-            case 2:
-                listarTabelas();
-                break;
-            case 3:
-                criarRegistro(&tabela);
-                break;
-            case 4:
-                listarDadosTabela(&tabela);
-                break;
-            case 7:
-                apagarTabela();
-                break;
-            default:
-                printf("INVALIDO! \n");
-                break;
-        }
+        op = escolhas(op);
     }
+    return 0;
 }
 
