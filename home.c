@@ -16,7 +16,7 @@ typedef struct {
     char colunaChavePrimaria[NOME_LIMITE];
 } Tabela;
 
-Tabela coletarDadosTabela(char nome[]) {
+Tabela coletarDadosTabela(char nome[]){
     Tabela tabela;
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE + 4];
@@ -50,7 +50,7 @@ Tabela coletarDadosTabela(char nome[]) {
     return tabela;
 }
 
-int existeChavePrimaria(Tabela *tabela, int num) {
+int existeChavePrimaria(Tabela *tabela, int num){
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE + 4];
     sprintf(nomeArquivo, "%s.txt", tabela->nome);
@@ -317,7 +317,7 @@ void criarRegistro(Tabela *tabela){
     fclose(arquivo);
 }
 
-void listarDadosTabela(Tabela *tabela) {
+void listarDadosTabela(Tabela *tabela){
     *tabela = coletarDadosTabela(tabela->nome);
 
     printf("=== DADOS DA TABELA %s ===\n", tabela->nome);
@@ -364,11 +364,52 @@ void listarDadosTabela(Tabela *tabela) {
     fclose(arquivo);
 }
 
+void apagarTabela(char nomeTabela[]) {
+    if (existeTabela(nomeTabela) != 1) {
+        printf("A TABELA %s NAO EXISTE\n", nomeTabela);
+        return;
+    }
+
+    FILE *tabelas;
+    FILE *tempFile;
+    char tabelastxt[] = "tabelas.txt";
+    char nomeTabelaTxt[NOME_LIMITE+4];
+    sprintf(nomeTabelaTxt, "%s.txt", nomeTabela);
+    char linha[NOME_LIMITE];
+
+    tabelas = fopen(tabelastxt, "r");
+    if (tabelas == NULL) {
+        printf("ERRO AO ABRIR O ARQUIVO %s\n", tabelastxt);
+        return;
+    }
+    tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        printf("ERRO AO CRIAR O ARQUIVO TEMPORÁRIO\n");
+        fclose(tabelas);
+        return;
+    }
+
+    // Procura e remove a tabela do arquivo original
+    while (fgets(linha, sizeof(linha), tabelas) != NULL) {
+        linha[strcspn(linha, "\n")] = '\0';
+        if (strcmp(nomeTabela, linha) != 0) {
+            fprintf(tempFile, "%s\n", linha);
+        }
+    }
+    fclose(tabelas);
+    fclose(tempFile);
+
+    remove(nomeTabelaTxt);
+    remove(tabelastxt);
+    rename("temp.txt", tabelastxt);
+    printf("TABELA '%s' REMOVIDA COM SUCESSO\n", nomeTabela);
+}
+
 int main(){
     int op;
     Tabela tabela;
     while(1){
-        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela |\n");
+        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela | 7 - Apagar uma tabela |\n");
         scanf("%d", &op);
         switch (op) {
             case 0:
@@ -400,6 +441,13 @@ int main(){
                 } else {
                     printf("A TABELA %s NAO EXISTE!\n", tabela.nome);
                 }
+                break;
+            case 7:
+                printf("INFORME O NOME DA TABELA QUE DESEJA APAGAR: ");
+                getchar();
+                fgets(tabela.nome, NOME_LIMITE, stdin);
+                tabela.nome[strcspn(tabela.nome, "\n")] = '\0';
+                apagarTabela(tabela.nome);
                 break;
             default:
                 printf("INVALIDO! \n");
