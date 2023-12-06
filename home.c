@@ -255,6 +255,15 @@ void listarTabelas(){
 }
 
 void criarRegistro(Tabela *tabela){
+    getchar();
+    printf("INFORME O NOME DA TABELA: ");
+    fgets(tabela->nome, NOME_LIMITE, stdin);
+    tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
+    if(!existeTabela(tabela->nome)){
+        printf("A TABELA %s NAO EXISTE!\n", tabela->nome);
+        return;
+    }
+
     *tabela = coletarDadosTabela(tabela->nome);
 
     FILE *arquivo;
@@ -318,6 +327,15 @@ void criarRegistro(Tabela *tabela){
 }
 
 void listarDadosTabela(Tabela *tabela){
+    getchar();
+    printf("INFORME O NOME DA TABELA: ");
+    fgets(tabela->nome, NOME_LIMITE, stdin);
+    tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
+    if(!existeTabela(tabela->nome)){
+        printf("A TABELA %s NAO EXISTE!\n", tabela->nome);
+        return;
+    }
+
     *tabela = coletarDadosTabela(tabela->nome);
 
     printf("=== DADOS DA TABELA %s ===\n", tabela->nome);
@@ -364,7 +382,13 @@ void listarDadosTabela(Tabela *tabela){
     fclose(arquivo);
 }
 
-void apagarTabela(char nomeTabela[]) {
+void apagarTabela() {
+
+    char nomeTabela[NOME_LIMITE];
+    printf("INFORME O NOME DA TABELA QUE DESEJA APAGAR: ");
+    getchar();
+    fgets(nomeTabela, NOME_LIMITE, stdin);
+    nomeTabela[strcspn(nomeTabela, "\n")] = '\0';
     if (existeTabela(nomeTabela) != 1) {
         printf("A TABELA %s NAO EXISTE\n", nomeTabela);
         return;
@@ -411,7 +435,7 @@ int main(){
     while(1){
         printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela | 7 - Apagar uma tabela |\n");
         scanf("%d", &op);
-        switch (op) {
+        switch(op){
             case 0:
                 return 0;
             case 1:
@@ -421,33 +445,13 @@ int main(){
                 listarTabelas();
                 break;
             case 3:
-                getchar();
-                printf("INFORME O NOME DA TABELA: ");
-                fgets(tabela.nome, NOME_LIMITE, stdin);
-                tabela.nome[strcspn(tabela.nome, "\n")] = '\0';
-                if(existeTabela(tabela.nome)){
-                    criarRegistro(&tabela);
-                } else {
-                    printf("A TABELA %s NAO EXISTE!\n", tabela.nome);
-                }
+                criarRegistro(&tabela);
                 break;
             case 4:
-                getchar();
-                printf("INFORME O NOME DA TABELA: ");
-                fgets(tabela.nome, NOME_LIMITE, stdin);
-                tabela.nome[strcspn(tabela.nome, "\n")] = '\0';
-                if(existeTabela(tabela.nome)){
-                    listarDadosTabela(&tabela);
-                } else {
-                    printf("A TABELA %s NAO EXISTE!\n", tabela.nome);
-                }
+                listarDadosTabela(&tabela);
                 break;
             case 7:
-                printf("INFORME O NOME DA TABELA QUE DESEJA APAGAR: ");
-                getchar();
-                fgets(tabela.nome, NOME_LIMITE, stdin);
-                tabela.nome[strcspn(tabela.nome, "\n")] = '\0';
-                apagarTabela(tabela.nome);
+                apagarTabela();
                 break;
             default:
                 printf("INVALIDO! \n");
