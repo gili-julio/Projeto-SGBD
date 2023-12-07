@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define NOME_LIMITE 50 // Definindo o limite máximo dos nomes para 50
 
@@ -113,8 +114,15 @@ void criarTabela(Tabela *tabela){
         printf("INFORME O NOME DA TABELA: ");
         fgets(tabela->nome, NOME_LIMITE, stdin);
         tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
+        // Converter para minúsculas
+        for (int i = 0; tabela->nome[i]; i++) {
+            tabela->nome[i] = tolower(tabela->nome[i]);
+        }
+        //Verifica se o nome da tabela já existe
         if(existeTabela(tabela->nome)){
             printf("A TABELA %s JA EXISTE!\n", tabela->nome);
+        } else if(strcmp(tabela->nome, "tabelas") == 0){
+            printf("O NOME %s NAO PODE SER UTILIZADO!\n", tabela->nome);
         } else {
             break;
         }
@@ -245,10 +253,17 @@ void listarTabelas(){
         return;
     }
 
-    printf("=== LISTA DE TABELAS ===\n");
+    int count = 0;
     while (fgets(nomeTabela, sizeof(nomeTabela), tabelaPrincipal) != NULL) {
+        if(count == 0){
+            printf("=== LISTA DE TABELAS ===\n");
+        }
         nomeTabela[strcspn(nomeTabela, "\n")] = '\0';
         printf("%s\n", nomeTabela);
+        count++;
+    }
+    if(count == 0){
+        printf("NAO FORAM ENCONTRADAS TABELAS \n");
     }
 
     fclose(tabelaPrincipal);
@@ -296,7 +311,6 @@ void criarRegistro(Tabela *tabela){
             char registroString[NOME_LIMITE];
             switch(tabela->colunas[i-1].tipo){
                 case 1: // Caso char
-                    getchar();
                     scanf("%c", &registroChar);
                     fprintf(arquivo, "%s: %c\n", tabela->colunas[i-1].nome, registroChar);
                     break;
@@ -368,9 +382,9 @@ void listarDadosTabela(Tabela *tabela){
         // Remove a quebra de linha dos registros
         linha[strcspn(linha, "\n")] = '\0';
         if(count % (tabela->numColunas + 1) == 0 && count != 0){
-            printf("|\n| %s ", linha); // Mostra a linha com quebra de linha e sem espaço
+            printf("|\nLinha %d: | %s ", (count/(tabela->numColunas + 1))+1, linha); // Mostra a linha com quebra de linha e sem espaço
         } else if(count == 0){
-            printf("| %s ", linha); // Mostra a linha sem quebra de linha e sem espaço
+            printf("Linha %d: | %s ", (count/(tabela->numColunas + 1))+1, linha); // Mostra a linha sem quebra de linha e sem espaço
         } else{
             printf("| %s ", linha); // Mostra a linha sem quebra de linha e com espaço
         }
