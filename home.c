@@ -327,13 +327,13 @@ void criarRegistro(Tabela *tabela){
                     fprintf(arquivo, "%s: %f\n", tabela->colunas[i-1].nome, registroDouble);
                     break;
                 case 5: // Caso string
-                    getchar();
                     fgets(registroString, NOME_LIMITE, stdin);
                     registroString[strcspn(registroString, "\n")] = '\0';
                     fprintf(arquivo, "%s: %s\n", tabela->colunas[i-1].nome, registroString);
                     break;
             }
         }
+        fflush(stdin);
     }
 
     printf("REGISTRO FEITO!\n");
@@ -341,7 +341,7 @@ void criarRegistro(Tabela *tabela){
 }
 
 void listarDadosTabela(Tabela *tabela){
-    getchar();
+    fflush(stdin);
     printf("INFORME O NOME DA TABELA: ");
     fgets(tabela->nome, NOME_LIMITE, stdin);
     tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
@@ -443,6 +443,112 @@ void apagarTabela() {
     printf("TABELA '%s' REMOVIDA COM SUCESSO\n", nomeTabela);
 }
 
+void procurarValor(Tabela *tabela){
+    // Verifica se existe a tabela desejada
+    fflush(stdin);
+    printf("INFORME O NOME DA TABELA: ");
+    fgets(tabela->nome, NOME_LIMITE, stdin);
+    tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
+    if(!existeTabela(tabela->nome)){
+        printf("A TABELA %s NAO EXISTE!\n", tabela->nome);
+        return;
+    }
+    *tabela = coletarDadosTabela(tabela->nome);
+
+    // Imprime o nome das colunas existentes
+    printf("> COLUNAS EXISTENTES:\n");
+    for(int i = 0; i <= tabela->numColunas; i++){
+        if(i == 0){ // Coluna primária
+            printf("> %d - %s\n", i, tabela->colunaChavePrimaria);
+        } else { // Outras colunas
+            printf("> %d - %s\n", i, tabela->colunas[i-1].nome);
+        }
+    }
+
+    // Solicita o nome da coluna e verifica se existe
+    int numeroColuna;
+    while(1){
+        printf("INFORME A COLUNA QUE DESEJA BUSCAR O VALOR: ");
+        scanf("%d", &numeroColuna);
+        if(numeroColuna > tabela->numColunas || numeroColuna < 0){
+            printf("COLUNA %d NAO ENCONTRADA!\n", numeroColuna);
+        } else {
+            if(numeroColuna == 0){
+                printf("--> A COLUNA %s FOI SELECIONADA\n", tabela->colunaChavePrimaria);
+            } else {
+                printf("--> A COLUNA %s FOI SELECIONADA\n", tabela->colunas[numeroColuna-1].nome);
+            }
+            break;
+        }
+    }
+
+    // Verifica o tipo da coluna e solicita o valor a ser buscado de acordo com o tipo
+    int tipoDaColuna;
+    if(numeroColuna == 0){
+        tipoDaColuna = 2;
+    } else {
+        tipoDaColuna = tabela->colunas[numeroColuna-1].tipo;
+    }
+    char valorChar;
+    int valorInt;
+    float valorFloat;
+    double valorDouble;
+    char valorString[NOME_LIMITE];
+    fflush(stdin);
+    printf("INFORME O VALOR A SER BUSCADO: ");
+    switch(tipoDaColuna){
+        case 1: // Caso char
+            scanf("%c", &valorChar);
+            break;
+        case 2: // Caso int
+            scanf("%d", &valorInt);
+            break;
+        case 3: // Caso float
+            scanf("%f", &valorFloat);
+            break;
+        case 4: // Caso double
+            scanf("%lf", &valorDouble);
+            break;
+        case 5: // Caso string
+            fgets(valorString, NOME_LIMITE, stdin);
+            valorString[strcspn(valorString, "\n")] = '\0';
+            break;
+    }
+
+    // Solicita uma opção
+    int continuar = 1;
+    int escolha;
+        while(continuar){
+            // Mostra somente as opções disponíveis para cada tipo
+            switch(tipoDaColuna){
+                case 1: // Caso char
+                    printf("> 3 - VALORES IGUAIS\n");
+                    break;
+                case 2: // Caso int
+                case 3: // Caso float
+                case 4: // Caso double
+                    printf("> 1 - VALORES MAIORES\n");
+                    printf("> 2 - VALORES IGUAIS ou MAIORES\n");
+                    printf("> 3 - VALORES IGUAIS\n");
+                    printf("> 4 - VALORES MENORES\n");
+                    printf("> 5 - VALORES IGUAIS ou MENORES\n");
+                    break;
+                case 5: // Caso string
+                    printf("> 3 - VALORES IGUAIS\n");
+                    printf("> 6 - VALORES PROXIMOS\n");
+                    break;
+                default:
+                    printf("--> VALOR INVALIDO <--\n");
+                    break;
+            }
+            printf("--> ESCOLHA UM MEIO DE BUSCA: ");
+            scanf("%d", &escolha);
+            // Verifica se a escolha existe e se está disponível para o tipo especifico
+        }
+
+    //...
+}
+
 int escolhas(int op){
     Tabela tabela;
     switch(op){
@@ -460,6 +566,9 @@ int escolhas(int op){
         case 4:
             listarDadosTabela(&tabela);
             break;
+        case 5:
+            procurarValor(&tabela);
+            break;
         case 7:
             apagarTabela();
             break;
@@ -473,7 +582,7 @@ int escolhas(int op){
 int main(){
     int op;
     while(op != 0){
-        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela | 7 - Apagar uma tabela |\n");
+        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela | 5 - Procurar valor | 7 - Apagar uma tabela |\n");
         scanf("%d", &op);
         op = escolhas(op);
     }
