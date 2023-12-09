@@ -515,9 +515,34 @@ void procurarValor(Tabela *tabela){
             break;
     }
 
+    // Abrir o arquivo da tabela para leitura dos registros (SIMILAR A FUNÇÃO LISTAR DADOS DA TABELA)
+    FILE *arquivo;
+    char nomeArquivo[NOME_LIMITE + 4];
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    arquivo = fopen(nomeArquivo, "r");
+    if(arquivo == NULL){
+        printf("ERRO AO ABRIR O ARQUIVO DA TABELA %s \n", nomeArquivo);
+        return;
+    }
+
+    int linhasParaPular = 3 + (2 * tabela->numColunas);
+    char linha[NOME_LIMITE * 2]; // buffer para armazenar a linha lida
+    int count = 0;
+    // Pular as linhas iniciais
+    while(count < linhasParaPular){
+        if(fgets(linha, sizeof(linha), arquivo) == NULL){
+            printf("ERRO: Não há registros nesta tabela.\n");
+            fclose(arquivo);
+            return;
+        }
+        count++;
+    }
+
     // Solicita uma opção
     int continuar = 1;
     int escolha;
+    int *linhasResultado = NULL;
+    int resultadosQtd = 0;
         while(continuar){
             // Mostra somente as opções disponíveis para cada tipo
             switch(tipoDaColuna){
@@ -538,13 +563,103 @@ void procurarValor(Tabela *tabela){
                     printf("> 6 - VALORES PROXIMOS\n");
                     break;
                 default:
-                    printf("--> VALOR INVALIDO <--\n");
+                    printf("--> TIPO DA COLUNA INVALIDO <--\n");
                     break;
             }
             printf("--> ESCOLHA UM MEIO DE BUSCA: ");
+            fflush(stdin);
             scanf("%d", &escolha);
+
             // Verifica se a escolha existe e se está disponível para o tipo especifico
+            switch(escolha){
+                case 1: // VALORES MAIORES
+                    if(tipoDaColuna == 2 || tipoDaColuna == 3 || tipoDaColuna == 4){
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores MAIORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            int valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %d", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile > valorInt){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else {
+                        printf("--> MEIO INVALIDO <--\n");
+                    }
+                    break;
+                case 2: // VALORES IGUAIS ou MAIORES
+                case 3: // VALORES IGUAIS
+                case 4: // VALORES MENORES
+                    printf("> 1 - VALORES MAIORES\n");
+                    printf("> 2 - VALORES IGUAIS ou MAIORES\n");
+                    printf("> 3 - VALORES IGUAIS\n");
+                    printf("> 4 - VALORES MENORES\n");
+                    printf("> 5 - VALORES IGUAIS ou MENORES\n");
+                    break;
+                case 5: // VALORES IGUAIS ou MENORES
+                    printf("> 3 - VALORES IGUAIS\n");
+                    printf("> 6 - VALORES PROXIMOS\n");
+                    break;
+                case 6: // VALORES PROXIMOS
+                    printf("> 3 - VALORES IGUAIS\n");
+                    printf("> 6 - VALORES PROXIMOS\n");
+                    break;
+                default:
+                    printf("--> MEIO INVALIDO <--\n");
+                    break;
+            }
         }
+
+    // Imprimir linhas encontradas
+
+    rewind(arquivo);
+    count = 0;
+    // Pular as linhas iniciais
+    while(count < linhasParaPular){
+        if(fgets(linha, sizeof(linha), arquivo) == NULL){
+            printf("ERRO: Não há registros nesta tabela.\n");
+            fclose(arquivo);
+            return;
+        }
+        count++;
+    }
+
+    // de fato Imprimir linhas encontradas
+    count = 0;
+    int resultadosImpressos = 0;
+    while(fgets(linha, sizeof(linha), arquivo) != NULL){
+        // Remove a quebra de linha dos registros
+        linha[strcspn(linha, "\n")] = '\0';
+        for(int i = 0; i < resultadosQtd; i++){
+            if(count/(tabela->numColunas + 1) == linhasResultado[i]){
+                if(count % (tabela->numColunas + 1) == 0 && resultadosImpressos != 0){
+                    printf("|\nLinha %d: | %s ", (count/(tabela->numColunas + 1))+1, linha); // Mostra a linha com quebra de linha e sem espaço
+                } else if(resultadosImpressos == 0){
+                    printf("-> LINHAS ENCONTRADAS <-\n");
+                    printf("Linha %d: | %s ", (count/(tabela->numColunas + 1))+1, linha); // Mostra a linha sem quebra de linha e sem espaço
+                } else{
+                    printf("| %s ", linha); // Mostra a linha sem quebra de linha e com espaço
+                }
+                resultadosImpressos++;
+            }
+        }
+        count++;
+    }
+    if((resultadosImpressos/(tabela->numColunas + 1)) != 0){
+        printf("|\n");
+        printf("-> LINHAS ENCONTRADAS <-\n");
+    }
+    fclose(arquivo);
+
 
     //...
 }
