@@ -289,7 +289,8 @@ void listarTabelas(){
 }
 
 void criarRegistro(Tabela *tabela){
-    getchar();
+    //Verifica se existe a tabela informada
+    fflush(stdin);
     printf("INFORME O NOME DA TABELA: ");
     fgets(tabela->nome, NOME_LIMITE, stdin);
     tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
@@ -1017,6 +1018,68 @@ void procurarValor(Tabela *tabela){
     //...
 }
 
+void apagarRegistro(Tabela *tabela){
+    // Verifica se existe a tabela desejada
+    fflush(stdin);
+    printf("INFORME O NOME DA TABELA: ");
+    fgets(tabela->nome, NOME_LIMITE, stdin);
+    tabela->nome[strcspn(tabela->nome, "\n")] = '\0';
+    if(!existeTabela(tabela->nome)){
+        printf("A TABELA %s NAO EXISTE!\n", tabela->nome);
+        return;
+    }
+    *tabela = coletarDadosTabela(tabela->nome);
+
+    //Verifica se existe a chave primária informada
+    int valorInformado;
+    printf("INFORME A CHAVE PRIMARIA DA LINHA PARA APAGAR: ");
+    scanf("%d", &valorInformado);
+    if(!existeChavePrimaria(tabela, valorInformado)){
+        printf("O VALOR %d NAO FOI ENCONTRADO!\n", valorInformado);
+        return;
+    }
+
+    char nomeArquivo[NOME_LIMITE+4];
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo %s\n", nomeArquivo);
+        return;
+    }
+
+    FILE *arquivoTemp = fopen("temp.txt", "w");
+    if (arquivoTemp == NULL) {
+        printf("Erro ao criar o arquivo temporário\n");
+        fclose(arquivo);
+        return;
+    }
+
+    char linha[NOME_LIMITE * 2];
+    int linhasRegistro = tabela->numColunas + 1; // quantidade de linhas de um registro na tabela
+    int count = 0;
+
+    // Copiar as linhas para o novo arquivo, exceto a linha a ser apagada
+    while(fgets(linha, sizeof(linha), arquivo) != NULL){
+        char colunaTeste[NOME_LIMITE];
+        int valorTeste;
+        sscanf(linha, "%[^:]: %d", colunaTeste, &valorTeste); // Leitura dos dados da linha
+        if( ( (strcmp(colunaTeste, tabela->colunaChavePrimaria) != 0) || (valorTeste != valorInformado) ) && (count%linhasRegistro == 0)){
+            fputs(linha, arquivoTemp);
+        } else {
+            count++;
+        }
+    }
+
+    fclose(arquivo);
+    fclose(arquivoTemp);
+
+    // Remover o arquivo original e renomear o temporário
+    remove(nomeArquivo);
+    rename("temp.txt", nomeArquivo);
+
+    printf("--> LINHA DELETADA COM SUCESSO <--\n");
+}
+
 int escolhas(int op){
     Tabela tabela;
     switch(op){
@@ -1037,6 +1100,9 @@ int escolhas(int op){
         case 5:
             procurarValor(&tabela);
             break;
+        case 6:
+            apagarRegistro(&tabela);
+            break;
         case 7:
             apagarTabela();
             break;
@@ -1050,7 +1116,16 @@ int escolhas(int op){
 int main(){
     int op;
     while(op != 0){
-        printf("| 0 - Encerrar | 1 - Nova Tabela | 2 - Listar Tabelas | 3 - Novo registro | 4 - Listar dados de uma tabela | 5 - Procurar valor | 7 - Apagar uma tabela |\n");
+        printf("--->\n");
+        printf("> 0 - Encerrar\n");
+        printf("> 1 - Criar uma tabela\n");
+        printf("> 2 - Listar todas as tabelas\n");
+        printf("> 3 - Criar uma linha na tabela\n");
+        printf("> 4 - Listar dados de uma tabela\n");
+        printf("> 5 - Procurar valor em uma tabela\n");
+        printf("> 6 - Apagar uma linha na tabela\n");
+        printf("> 7 - Apagar uma tabela\n");
+        printf("---> Deseja fazer: ");
         scanf("%d", &op);
         op = escolhas(op);
     }
