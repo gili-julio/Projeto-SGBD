@@ -108,6 +108,22 @@ int existeTabela(char nome[]){
     return 0;
 }
 
+int existeValorNaString(char valor[], char string[]){
+    for(int i = 0; string[i]; i++){
+        int esta = 1;
+        for(int j = 0; valor[j]; j++){
+            if(tolower(valor[j]) != tolower(string[i+j])){
+                esta = 0;
+                break;
+            }
+        }
+        if(esta){
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void criarTabela(Tabela *tabela){
     getchar();
     while(1){
@@ -320,7 +336,7 @@ void criarRegistro(Tabela *tabela){
                     break;
                 case 3: // Caso float
                     scanf("%f", &registroFloat);
-                    fprintf(arquivo, "%s: %f\n", tabela->colunas[i-1].nome, registroFloat);
+                    fprintf(arquivo, "%s: %.2f\n", tabela->colunas[i-1].nome, registroFloat);
                     break;
                 case 4: // Caso double
                     scanf("%lf", &registroDouble);
@@ -573,7 +589,7 @@ void procurarValor(Tabela *tabela){
             // Verifica se a escolha existe e se está disponível para o tipo especifico
             switch(escolha){
                 case 1: // VALORES MAIORES
-                    if(tipoDaColuna == 2 || tipoDaColuna == 3 || tipoDaColuna == 4){
+                    if(tipoDaColuna == 2){
                         continuar = 0;
                         //Agora começamos a busca pelos valores MAIORES
                         count = 0;
@@ -592,26 +608,357 @@ void procurarValor(Tabela *tabela){
                             }
                             count++;
                         }
+                    } else if(tipoDaColuna == 3) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores MAIORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            float valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %f", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile > valorFloat){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 4) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores MAIORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            double valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %lf", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile > valorDouble){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
                     } else {
                         printf("--> MEIO INVALIDO <--\n");
                     }
                     break;
                 case 2: // VALORES IGUAIS ou MAIORES
+                    if(tipoDaColuna == 2){
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS ou MAIORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            int valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %d", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile >= valorInt){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 3) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS ou MAIORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            float valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %f", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile >= valorFloat){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 4) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS ou MAIORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            double valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %lf", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile >= valorDouble){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else {
+                        printf("--> MEIO INVALIDO <--\n");
+                    }
+                    break;
                 case 3: // VALORES IGUAIS
+                    if(tipoDaColuna == 1){
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            char valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %c", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(tolower(valorWhile) == tolower(valorChar)){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 2){
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            int valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %d", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile == valorInt){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 3) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            float valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %f", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile == valorFloat){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 4) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            double valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %lf", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile == valorDouble){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 5) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            char valorWhile[NOME_LIMITE];
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %[^\n]", colunaWhile, valorWhile); // Leitura dos dados da linha
+                                if(strcmp(valorWhile, valorString) == 0){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else {
+                        printf("--> MEIO INVALIDO <--\n");
+                    }
+                    break;
                 case 4: // VALORES MENORES
-                    printf("> 1 - VALORES MAIORES\n");
-                    printf("> 2 - VALORES IGUAIS ou MAIORES\n");
-                    printf("> 3 - VALORES IGUAIS\n");
-                    printf("> 4 - VALORES MENORES\n");
-                    printf("> 5 - VALORES IGUAIS ou MENORES\n");
+                    if(tipoDaColuna == 2){
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores MENORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            int valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %d", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile < valorInt){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 3) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores MENORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            float valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %f", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile < valorFloat){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 4) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores MENORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            double valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %lf", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile < valorDouble){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else {
+                        printf("--> MEIO INVALIDO <--\n");
+                    }
                     break;
                 case 5: // VALORES IGUAIS ou MENORES
-                    printf("> 3 - VALORES IGUAIS\n");
-                    printf("> 6 - VALORES PROXIMOS\n");
+                    if(tipoDaColuna == 2){
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS ou MENORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            int valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %d", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile <= valorInt){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 3) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS ou MENORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            float valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %f", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile <= valorFloat){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else if(tipoDaColuna == 4) {
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores IGUAIS ou MENORES
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            double valorWhile;
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %lf", colunaWhile, &valorWhile); // Leitura dos dados da linha
+                                if(valorWhile <= valorDouble){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else {
+                        printf("--> MEIO INVALIDO <--\n");
+                    }
                     break;
-                case 6: // VALORES PROXIMOS
-                    printf("> 3 - VALORES IGUAIS\n");
-                    printf("> 6 - VALORES PROXIMOS\n");
+                case 6: // VALORES PROXIMOS (considero: PROXIMOS = a palavra se encontra na string)
+                    if(tipoDaColuna == 5){
+                        continuar = 0;
+                        //Agora começamos a busca pelos valores PROXIMOS (considero: PROXIMOS = a palavra se encontra na string)
+                        count = 0;
+                        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                            char colunaWhile[NOME_LIMITE];
+                            char valorWhile[NOME_LIMITE];
+                            // Remove a quebra de linha dos registros
+                            linha[strcspn(linha, "\n")] = '\0';
+                            if ((count) % (tabela->numColunas+1) == numeroColuna) {
+                                sscanf(linha, "%[^:]: %[^\n]", colunaWhile, valorWhile); // Leitura dos dados da linha
+                                if(existeValorNaString(valorWhile, valorString)){
+                                    linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
+                                    linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
+                                    resultadosQtd++;
+                                }
+                            }
+                            count++;
+                        }
+                    } else {
+                        printf("--> MEIO INVALIDO <--\n");
+                    }
                     break;
                 default:
                     printf("--> MEIO INVALIDO <--\n");
@@ -657,6 +1004,8 @@ void procurarValor(Tabela *tabela){
     if((resultadosImpressos/(tabela->numColunas + 1)) != 0){
         printf("|\n");
         printf("-> LINHAS ENCONTRADAS <-\n");
+    } else {
+        printf("-> NENHUM RESULTADO <-\n");
     }
     fclose(arquivo);
 
