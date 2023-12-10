@@ -108,6 +108,25 @@ int existeTabela(char nome[]){
     return 0;
 }
 
+int existeValorNaString(char valor[], char string[]){
+    if(strlen(valor) > strlen(string)){
+        return 0;
+    }
+    for(unsigned int i = 0; i <= strlen(string) - strlen(valor); i++){
+        int esta = 1;
+        for(unsigned int j = 0; j < strlen(valor); j++){
+            if (tolower(valor[j]) != tolower(string[i+j])) {
+                esta = 0;
+                break;
+            }
+        }
+        if(esta){
+            return 1; // Valor encontrado na string
+        }
+    }
+    return 0; // Valor não encontrado na string
+}
+
 void criarTabela(Tabela *tabela){
     getchar();
     while(1){
@@ -932,7 +951,8 @@ void procurarValor(Tabela *tabela){
                             linha[strcspn(linha, "\n")] = '\0';
                             if ((count) % (tabela->numColunas+1) == numeroColuna) {
                                 sscanf(linha, "%[^:]: %[^\n]", colunaWhile, valorWhile); // Leitura dos dados da linha
-                                if(existeValorNaString(valorWhile, valorString)){
+                                if(existeValorNaString(valorString, valorWhile)){
+                                    printf("%s\n%s\n", valorString, valorWhile);
                                     linhasResultado = realloc(linhasResultado, (resultadosQtd + 1) * sizeof(int));
                                     linhasResultado[resultadosQtd] = count/(tabela->numColunas+1);
                                     resultadosQtd++;
