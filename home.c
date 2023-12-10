@@ -108,22 +108,6 @@ int existeTabela(char nome[]){
     return 0;
 }
 
-int existeValorNaString(char valor[], char string[]){
-    for(int i = 0; string[i]; i++){
-        int esta = 1;
-        for(int j = 0; valor[j]; j++){
-            if(tolower(valor[j]) != tolower(string[i+j])){
-                esta = 0;
-                break;
-            }
-        }
-        if(esta){
-            return 1;
-        }
-    }
-    return 0;
-}
-
 void criarTabela(Tabela *tabela){
     getchar();
     while(1){
