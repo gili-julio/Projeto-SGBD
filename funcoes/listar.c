@@ -5,7 +5,7 @@
 
 void listarTabelas(){
     FILE *tabelaPrincipal;
-    char nome[] = "tabelas/tabelas.txt";
+    char nome[] = "tabelas.txt";
     char nomeTabela[NOME_LIMITE];
 
     tabelaPrincipal = fopen(nome, "r");
@@ -47,7 +47,7 @@ void listarDadosTabela(Tabela *tabela){
     // Abrir o arquivo da tabela para leitura dos registros
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE + 4];
-    sprintf(nomeArquivo, "tabelas/%s.txt", tabela->nome);
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
     arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
         printf("ERRO AO ABRIR O ARQUIVO %s \n", nomeArquivo);

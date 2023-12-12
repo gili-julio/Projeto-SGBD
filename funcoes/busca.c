@@ -14,9 +14,9 @@ void apagarTabela() {
 
     FILE *tabelas;
     FILE *tempFile;
-    char tabelastxt[] = "tabelas/tabelas.txt";
+    char tabelastxt[] = "tabelas.txt";
     char nomeTabelaTxt[NOME_LIMITE+4];
-    sprintf(nomeTabelaTxt, "tabelas/%s.txt", nomeTabela);
+    sprintf(nomeTabelaTxt, "%s.txt", nomeTabela);
     char linha[NOME_LIMITE];
 
     tabelas = fopen(tabelastxt, "r");
@@ -24,7 +24,7 @@ void apagarTabela() {
         printf("ERRO AO ABRIR O ARQUIVO %s\n", tabelastxt);
         return;
     }
-    tempFile = fopen("tabelas/temp.txt", "w");
+    tempFile = fopen("temp.txt", "w");
     if (tempFile == NULL) {
         printf("ERRO AO CRIAR O ARQUIVO TEMPORÁRIO\n");
         fclose(tabelas);
@@ -43,7 +43,7 @@ void apagarTabela() {
 
     remove(nomeTabelaTxt);
     remove(tabelastxt);
-    rename("tabelas/temp.txt", "tabelas/tabelas.txt");
+    rename("temp.txt", "tabelas.txt");
     printf("TABELA '%s' REMOVIDA COM SUCESSO\n", nomeTabela);
 }
 
@@ -122,7 +122,7 @@ void procurarValor(Tabela *tabela){
     // Abrir o arquivo da tabela para leitura dos registros (SIMILAR A FUNÇÃO LISTAR DADOS DA TABELA)
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE + 4];
-    sprintf(nomeArquivo, "tabelas/%s.txt", tabela->nome);
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
     arquivo = fopen(nomeArquivo, "r");
     if(arquivo == NULL){
         printf("ERRO AO ABRIR O ARQUIVO DA TABELA %s \n", nomeArquivo);
@@ -624,14 +624,14 @@ void apagarRegistro(Tabela *tabela){
     }
 
     char nomeArquivo[NOME_LIMITE*2];
-    sprintf(nomeArquivo, "tabelas/%s.txt", tabela->nome);
+    sprintf(nomeArquivo, "%s.txt", tabela->nome);
     FILE *arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo %s\n", nomeArquivo);
         return;
     }
 
-    FILE *arquivoTemp = fopen("tabelas/temp.txt", "w");
+    FILE *arquivoTemp = fopen("temp.txt", "w");
     if (arquivoTemp == NULL) {
         printf("Erro ao criar o arquivo temporário\n");
         fclose(arquivo);
@@ -659,7 +659,7 @@ void apagarRegistro(Tabela *tabela){
 
     // Remover o arquivo original e renomear o temporário
     remove(nomeArquivo);
-    rename("tabelas/temp.txt", nomeArquivo);
+    rename("temp.txt", nomeArquivo);
 
     printf("--> LINHA DELETADA COM SUCESSO <--\n");
 }
