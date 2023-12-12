@@ -166,6 +166,7 @@ void criarRegistro(Tabela *tabela){
                 fprintf(arquivo, "%s: %d\n", tabela->colunaChavePrimaria, registro);
             } else {
                 printf("VALOR INVALIDO!\n");
+                break;
                 return;
             }
         } else {
