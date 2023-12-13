@@ -4,7 +4,7 @@ Tabela coletarDadosTabela(char nome[]){
     Tabela tabela;
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE * 2];
-    sprintf(nomeArquivo, "%s.txt", nome);
+    sprintf(nomeArquivo, "tabelas/%s.txt", nome);
 
     arquivo = fopen(nomeArquivo, "rb");
     if (arquivo == NULL) {
@@ -37,7 +37,7 @@ Tabela coletarDadosTabela(char nome[]){
 int existeChavePrimaria(Tabela *tabela, int num){
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE + 4];
-    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    sprintf(nomeArquivo, "tabelas/%s.txt", tabela->nome);
 
     arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
@@ -69,7 +69,7 @@ int existeChavePrimaria(Tabela *tabela, int num){
 
 int existeTabela(char nome[]){
     FILE *tabelaPrincipal;
-    char tabelas[] = "tabelas.txt";
+    char tabelas[] = "tabelas/tabelas.txt";
     char linha[NOME_LIMITE];
     
     // Se não existir o arquivo tabelas.txt

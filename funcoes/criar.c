@@ -79,7 +79,7 @@ void criarTabela(Tabela *tabela){
     // Nome do arquivo baseado no nome da tabela
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE+4];
-    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    sprintf(nomeArquivo, "tabelas/%s.txt", tabela->nome);
     
     // Abre o arquivo para escrita
     arquivo = fopen(nomeArquivo, "w");
@@ -102,10 +102,11 @@ void criarTabela(Tabela *tabela){
 
 
     FILE *tabelaPrincipal;
-    char nome[] = "tabelas.txt";
+    char nome[] = "tabelas/tabelas.txt";
     // Verifica se o arquivo existe
     tabelaPrincipal = fopen(nome, "r");
     if (tabelaPrincipal == NULL){
+        fclose(tabelaPrincipal);
         // Se o arquivo não existir, cria um novo
         tabelaPrincipal = fopen(nome, "w");
         if(tabelaPrincipal == NULL){
@@ -113,6 +114,7 @@ void criarTabela(Tabela *tabela){
             return;
         }
     } else {
+        fclose(tabelaPrincipal);
         // Se o arquivo existir, abre para adicionar conteúdo no final
         tabelaPrincipal = fopen(nome, "a");
         if(tabelaPrincipal == NULL){
@@ -149,7 +151,7 @@ void criarRegistro(Tabela *tabela){
 
     FILE *arquivo;
     char nomeArquivo[NOME_LIMITE + 4];
-    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    sprintf(nomeArquivo, "tabelas/%s.txt", tabela->nome);
     arquivo = fopen(nomeArquivo, "a");
     if(arquivo == NULL){
         printf("ERRO AO ABRIR O ARQUIVO %s \n", nomeArquivo);

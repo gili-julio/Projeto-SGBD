@@ -14,9 +14,9 @@ void apagarTabela() {
 
     FILE *tabelas;
     FILE *tempFile;
-    char tabelastxt[] = "tabelas.txt";
-    char nomeTabelaTxt[NOME_LIMITE+4];
-    sprintf(nomeTabelaTxt, "%s.txt", nomeTabela);
+    char tabelastxt[] = "tabelas/tabelas.txt";
+    char nomeTabelaTxt[NOME_LIMITE+66];
+    sprintf(nomeTabelaTxt, "tabelas/%s.txt", nomeTabela);
     char linha[NOME_LIMITE];
 
     tabelas = fopen(tabelastxt, "r");
@@ -24,7 +24,7 @@ void apagarTabela() {
         printf("ERRO AO ABRIR O ARQUIVO %s\n", tabelastxt);
         return;
     }
-    tempFile = fopen("temp.txt", "w");
+    tempFile = fopen("tabelas/temp.txt", "w");
     if (tempFile == NULL) {
         printf("ERRO AO CRIAR O ARQUIVO TEMPORÁRIO\n");
         fclose(tabelas);
@@ -41,9 +41,18 @@ void apagarTabela() {
     fclose(tabelas);
     fclose(tempFile);
 
-    remove(nomeTabelaTxt);
-    remove(tabelastxt);
-    rename("temp.txt", "tabelas.txt");
+    if(remove(nomeTabelaTxt) == 0){
+    } else {
+        perror("Erro removendo a tabelas");
+    }
+    if(remove(tabelastxt) == 0){
+    } else {
+        perror("Erro removendo a tabela original");
+    }
+    if(rename("tabelas/temp.txt", "tabelas/tabelas.txt") == 0){
+    } else {
+        perror("Erro renomeando");
+    }
     printf("TABELA '%s' REMOVIDA COM SUCESSO\n", nomeTabela);
 }
 
@@ -624,14 +633,14 @@ void apagarRegistro(Tabela *tabela){
     }
 
     char nomeArquivo[NOME_LIMITE*2];
-    sprintf(nomeArquivo, "%s.txt", tabela->nome);
+    sprintf(nomeArquivo, "tabelas/%s.txt", tabela->nome);
     FILE *arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo %s\n", nomeArquivo);
         return;
     }
 
-    FILE *arquivoTemp = fopen("temp.txt", "w");
+    FILE *arquivoTemp = fopen("tabelas/temp.txt", "w");
     if (arquivoTemp == NULL) {
         printf("Erro ao criar o arquivo temporário\n");
         fclose(arquivo);
@@ -658,8 +667,18 @@ void apagarRegistro(Tabela *tabela){
     fclose(arquivoTemp);
 
     // Remover o arquivo original e renomear o temporário
-    remove(nomeArquivo);
-    rename("temp.txt", nomeArquivo);
+    int contagem = 0;
+    while(1){
+        if(remove(nomeArquivo) != 0 && contagem == 0){
+            contagem++;
+        }
+        if(rename("tabelas/temp.txt", nomeArquivo) != 0 && contagem == 1){
+            contagem++;
+        }
+        if(contagem >= 2){
+            break;
+        }
+    }
 
     printf("--> LINHA DELETADA COM SUCESSO <--\n");
 }
